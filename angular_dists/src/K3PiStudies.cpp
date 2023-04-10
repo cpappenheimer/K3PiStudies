@@ -207,18 +207,14 @@ namespace K3PiStudies
 
 		TVector3 yhatPrime = (pC_3vec.Cross(pD_3vec)).Unit();
 
-		double phi = K3PiStudiesUtils::angleBetweenPlanes(yhat, yhatPrime);
-		// double sinPhi = planesPerp.Dot(planesPerpUnit); // formula from ang dist. paper (xhat.Dot(yhatPrime)) doesn't work in all cases?)
+		double phi = K3PiStudiesUtils::angleBetweenPlanes(yhat, yhatPrime, true, verifyAngles);
+		// double sinPhi; // formula from ang dist. paper (xhat.Dot(yhatPrime)) doesn't work in all cases?)
 
 		double tripleProduct = yhat.Dot(pC_3vec);
 
 		// as a sanity check, compare phi with Adrian's Triple Product
 		// using zhat rather than p_a \cross p_b for convvenience of visualization
 		double angle = yhat.Angle(yhatPrime);
-		if (verifyAngles)
-		{
-			K3PiStudiesUtils::areDoublesEqual(K3PiStudiesUtils::combinedToleranceCompare, phi, angle, "Event " + evtStr + " phi/angle", true);
-		}
 		if (printSanityChecks)
 		{
 			std::cout << "pA_3vec  ";
@@ -243,10 +239,6 @@ namespace K3PiStudies
 			pCD_3vec.Print();
 			std::cout << "yhatPrime  ";
 			yhatPrime.Print();
-			std::cout << "Angle from Angle =  " << angle << std::endl;
-			std::cout << "phi =  " << phi << std::endl;
-			std::cout << "Angle from Angle (deg) =  " << K3PiStudiesUtils::radToDeg(angle) << std::endl;
-			std::cout << "phi (deg) =  " << K3PiStudiesUtils::radToDeg(phi) << std::endl;
 		}
 
 		double paX = pA_3vec.Dot(xhat);
@@ -386,21 +378,12 @@ namespace K3PiStudies
 		double cosPhiA = K3PiStudiesUtils::cosAngleBetweenPlanes(yhatA, yhatAPrime);
 		double sinPhiA = K3PiStudiesUtils::sinAngleBetweenPlanes(yhatA, yhatAPrime); // formula from ang dist. paper (xhatA.Dot(yhatAPrime)) doesn't work in all cases?
 		commonHists.cosVsinPlotA->Fill(cosPhiA, sinPhiA);
-		double phiA = K3PiStudiesUtils::angleBetweenPlanes(yhatA, yhatAPrime);
+		double phiA = K3PiStudiesUtils::angleBetweenPlanes(yhatA, yhatAPrime, true, verifyAngles);
 
-		double angleA = yhatA.Angle(yhatAPrime);
-		if (verifyAngles)
-		{
-			K3PiStudiesUtils::areDoublesEqual(K3PiStudiesUtils::combinedToleranceCompare, phiA, angleA, "Event " + evtStr + " phiA/angleA", true);
-		}
 		if (printSanityChecks)
 		{
 			std::cout << "cosPhiA: " << cosPhiA << std::endl;
 			std::cout << "sinPhiA: " << sinPhiA << std::endl;
-			std::cout << "phiA: " << phiA << std::endl;
-			std::cout << "phiA from Angle(): " << angleA << std::endl;
-			std::cout << "phiA (deg): " << K3PiStudiesUtils::radToDeg(phiA) << std::endl;
-			std::cout << "phiA from Angle() (deg): " << K3PiStudiesUtils::radToDeg(angleA) << std::endl;
 		}
 		commonHists.allPhiAHist->Fill(phiA);
 
@@ -1225,40 +1208,43 @@ namespace K3PiStudies
 			{
 				// phi from ntuple making code is in range -pi to pi
 				double id_verified_D0Fit_phi_ord_best_0_to_2pi = K3PiStudiesUtils::changeAngleRange_0_to_2pi(id_verified_D0Fit_phi_ord_best);
-				// ntuple making code has norm vector for pi pi plane rotated by 180 deg (ie, norm = p(OS pi) x p(SS pi) rather than norm = p(SS pi) x p(OS pi), as is done here)
-				// so rotate the phi from ntuples by pi (in appropriate direction) to compare it with the angle we get using norm = p(SS pi) x p(OS pi) 
-				double rotPhi_0_to_2pi;
-				if (id_verified_D0Fit_phi_ord_best_0_to_2pi > K3PiStudiesUtils::_PI)
-				{
-					rotPhi_0_to_2pi = id_verified_D0Fit_phi_ord_best_0_to_2pi - K3PiStudiesUtils::_PI;
-				}
-				else
-				{
-					rotPhi_0_to_2pi = id_verified_D0Fit_phi_ord_best_0_to_2pi + K3PiStudiesUtils::_PI;
-				}
+
+				// ntuple making code has norm vector for pi pi plane rotated by 180 deg (ie, norm1 = p(OS pi) x p(SS pi) rather than norm2 = p(SS pi) x p(OS pi), as is done here)
+				// and calcs sin phi using norm1 (pi pi plane) x norm2 (k pi plane) rather than k pi plane x pi pi plane, as is done here
+				// i.e., in ntuple code:
+				// n1 = - our yhatPrime
+				// n2 = our yhat
+				// So rotate phi (in appropriate direction) to compare it with the angle we get in ntuples
+				double angleToComp_0_to_2pi = K3PiStudiesUtils::_PI - id_verified_D0Fit_phi_ord_best_0_to_2pi;
+				double angleToComp_neg_pi_to_pi = K3PiStudiesUtils::changeAngleRange_neg_pi_to_pi(angleToComp_0_to_2pi);
 
 				Phsp4Body ntuplePhsp = Phsp4Body(
 					id_verified_D0Fit_m34_ord_best,
 					id_verified_D0Fit_m12_ord_best,
 					id_verified_D0Fit_cos34_ord_best,
 					id_verified_D0Fit_cos12_ord_best,
-					rotPhi_0_to_2pi);
+					angleToComp_neg_pi_to_pi);
 
 				int numDiffs = ntuplePhsp.compare(myPhsp, K3PiStudiesUtils::combinedToleranceCompare, jentry);
 				totNumPhspDiffs += numDiffs;
 
 				if (printSanityChecks)
 				{
-					std::cout << "D0Fit_phi_ord_best (orig): " << id_verified_D0Fit_phi_ord_best << std::endl;
-					std::cout << "D0Fit_phi_ord_best: " << id_verified_D0Fit_phi_ord_best_0_to_2pi << std::endl;
-					std::cout << "rotPhi_0_to_2pi (rotated by pi): " << rotPhi_0_to_2pi << std::endl;
+					std::cout << "D0Fit_phi_ord_best: " << id_verified_D0Fit_phi_ord_best << std::endl;
 					std::cout << "phi: " << myPhsp._phi_rad << std::endl;
-					std::cout << "D0Fit_phi_ord_best (orig, deg): " << K3PiStudiesUtils::radToDeg(id_verified_D0Fit_phi_ord_best) << std::endl;
-					std::cout << "D0Fit_phi_ord_best (deg): " << K3PiStudiesUtils::radToDeg(id_verified_D0Fit_phi_ord_best_0_to_2pi) << std::endl;
-					std::cout << "rotPhi_0_to_2pi (rotated by pi, deg): " << K3PiStudiesUtils::radToDeg(rotPhi_0_to_2pi) << std::endl;
+					std::cout << "Angle to compare: " << angleToComp_0_to_2pi << std::endl;
+					std::cout << "Angle to compare (neg pi to pi): " << angleToComp_neg_pi_to_pi << std::endl;
+					
+					std::cout << "D0Fit_phi_ord_best (deg): " << K3PiStudiesUtils::radToDeg(id_verified_D0Fit_phi_ord_best) << std::endl;
 					std::cout << "phi (deg): " << K3PiStudiesUtils::radToDeg(myPhsp._phi_rad) << std::endl;
-					K3PiStudiesUtils::areDoublesEqual(K3PiStudiesUtils::combinedToleranceCompare, myPhsp._phi_rad, rotPhi_0_to_2pi, "Event " + std::to_string(jentry) + " phsp phi", true);
-					std::cout << std::endl;
+					std::cout << "Angle to compare (deg): " << K3PiStudiesUtils::radToDeg(angleToComp_0_to_2pi) << std::endl;
+					std::cout << "Angle to compare (neg pi to pi, deg): " << K3PiStudiesUtils::radToDeg(angleToComp_neg_pi_to_pi) << std::endl;
+
+					K3PiStudiesUtils::areDoublesEqual(
+						K3PiStudiesUtils::combinedToleranceCompare, 
+						myPhsp._phi_rad, 
+						angleToComp_neg_pi_to_pi, 
+						"Event " + std::to_string(jentry) + " phsp phi", true);
 				}
 			}
 		} // end loop over events

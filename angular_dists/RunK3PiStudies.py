@@ -19,7 +19,7 @@ def main():
     # RS
     #filesToProcess = ["/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/randomly_selected_RS_multiple_candidates.root", "/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/selected_rs_single_candidates.root"]
     #filesToProcess = ["/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/selected_rs_single_candidates.root"]
-    filesToProcess = ["/data/home/pappenheimer/d2k3pi_data/test/SUBSET_selected_evts_with_multiple_candidates_2015_MagDown_RS.root"]
+    filesToProcess = ["/data/home/pappenheimer/d2k3pi_data/test/selected_evts_with_multiple_candidates_2015_MagDown_RS.root"]
 
     # true if sample is toy MC; false otherwise
     isToyMC = False
@@ -45,13 +45,13 @@ def main():
     varType = "D0_FIT"
 
     # Set to true to compare the values of the phase space variables in the ntuple to the ones we calculate here (only for D0_Fit vars)
-    comparePhsp = False
+    comparePhsp = True
 
     # Set to true to print info for the first event
     printSanityChecks = False
 
     # Set to true if want to check that our calculated angles between vectors match results of ROOT's .Angle method
-    verifyAngles = True
+    verifyAngles = False
     ##### done setting up sample sets 
 
 
