@@ -13,13 +13,13 @@ def main():
     runDir = "../build"
 
     # the path to the directory in which to create the output root files (don't include trailing /)
-    outDir = "/share/lazy/pappenheimer/d2k3pi/test_plots"
+    outDir = "/share/lazy/pappenheimer/d2k3pi/plotting/angular_dist_plots"
 
     # list of the root files to process
     # RS
-    #filesToProcess = ["/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/randomly_selected_RS_multiple_candidates.root", "/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/selected_rs_single_candidates.root"]
+    filesToProcess = ["/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/randomly_selected_RS_multiple_candidates.root", "/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/selected_rs_single_candidates.root"]
     #filesToProcess = ["/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/selected_rs_single_candidates.root"]
-    filesToProcess = ["/data/home/pappenheimer/d2k3pi_data/test/selected_evts_with_multiple_candidates_2015_MagDown_RS.root"]
+    #filesToProcess = ["/data/home/pappenheimer/d2k3pi_data/selected_data_extended/2015/selected_evts_with_multiple_candidates_2015_MagDown_RS.root"]
 
     # true if sample is toy MC; false otherwise
     isToyMC = False
@@ -42,16 +42,19 @@ def main():
     useLHCbStyle = True
 
     # The variable type to use for the daughter momenta: either REFIT, D0_FIT, or P (the D0_P0_PX, ... vars) [not used for toy MC]
-    varType = "D0_FIT"
+    varType = "REFIT"
 
     # Set to true to compare the values of the phase space variables in the ntuple to the ones we calculate here (only for D0_Fit vars)
-    comparePhsp = True
+    comparePhsp = False
 
     # Set to true to print info for the first event
     printSanityChecks = False
 
     # Set to true if want to check that our calculated angles between vectors match results of ROOT's .Angle method
     verifyAngles = False
+
+    # The (m, deltaM) region in which to process data (applies m, deltaM cut): either ALL or SIGNAL
+    region = "ALL"
     ##### done setting up sample sets 
 
 
@@ -60,7 +63,7 @@ def main():
     commaSepFileList = ",".join(filesToProcess)
 
     # generate run command
-    runArgs = "-f " + commaSepFileList + " -o " + outDir + " -m " + mode + " -v " + varType
+    runArgs = "-f " + commaSepFileList + " -o " + outDir + " -m " + mode + " -v " + varType + " -r " + region
     if isToyMC:
         runArgs += " --toyMC"
     if applyMikeCuts:

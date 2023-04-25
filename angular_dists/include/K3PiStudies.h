@@ -303,7 +303,8 @@ namespace K3PiStudies
           bool printSanityChecks,
           const std::string &varType,
           bool comparePhsp,
-          bool verifyAngles);
+          bool verifyAngles,
+          const std::string& region);
    };
 
    K3PiStudies::K3PiStudies(TTree *tree) : fChain(0)
