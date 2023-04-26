@@ -224,6 +224,17 @@ namespace K3PiStudies
 	private:
 		static const unsigned int _NUM_D0_MASS_BINS = 120;
 		static const unsigned int _NUM_DELTA_M_BINS = 80;
+		static const unsigned int _NUM_M_AB_BINS = 50;
+		static const unsigned int _NUM_FINE_M_AB_BINS = 200;
+		static const unsigned int _NUM_M_CD_BINS = 50;
+		static const unsigned int _NUM_FINE_M_CD_BINS = 200;
+		static constexpr double _M_AB_AXIS_MIN_MEV = 550.0;
+		static constexpr double _M_AB_AXIS_MAX_MEV = 1300.0;
+		static constexpr double _M_CD_AXIS_MIN_MEV = 200.0;
+		static constexpr double _M_CD_AXIS_MAX_MEV = 1300.0;
+		static const unsigned int _NUM_D0_DECAY_T_BINS = 80;
+		static constexpr double _D0_DECAY_T_AXIS_MIN = 0.0;
+		static constexpr double _D0_DECAY_T_AXIS_MAX = 8.0;
 
 		static inline const TString _D0_STR = "D^{0}";
 		static inline const TString _D0_BAR_STR = "#bar{D^{0}}";
@@ -235,6 +246,10 @@ namespace K3PiStudies
 		static inline const TString _D0_BAR_MASS_LABEL = "m(#bar{D^{0}}) [MeV]";
 		static inline const TString _KPIPIPI_MASS_LABEL = "m(K #pi #pi #pi) [MeV]";
 		static inline const TString _DELTA_M_LABEL = "#Delta m [MeV]";
+		static inline const TString _D0_DECAY_T_LABEL = "D^{0} decay time / #tau_{D^{0}}";
+
+		static inline const TString _D0_MASS_YAXIS_LABEL_NO_ZOOM = K3PiStudiesUtils::makeYAxisLabel(_NUM_D0_MASS_BINS, K3PiStudiesUtils::_ALL_REGS_D0_MASS_AXIS_MIN_MEV, K3PiStudiesUtils::_ALL_REGS_D0_MASS_AXIS_MAX_MEV, "MeV", false);
+		static inline const TString _DELTA_M_YAXIS_LABEL_NO_ZOOM = K3PiStudiesUtils::makeYAxisLabel(_NUM_DELTA_M_BINS, K3PiStudiesUtils::_ALL_REGS_DELTAM_AXIS_MIN_MEV, K3PiStudiesUtils::_ALL_REGS_DELTAM_AXIS_MAX_MEV, "MeV", false);
 
 		const TString _name_prefix;
 		const double _D0_MASS_AXIS_MIN_MEV;
@@ -251,15 +266,14 @@ namespace K3PiStudies
 			double d0MassAxisMinMeV,
 			double d0MassAxisMaxMeV,
 			double deltaMAxisMinMeV,
-			double deltaMAxisMaxMeV) : 
-			_name_prefix(namePrefix), 
-			_D0_MASS_AXIS_MIN_MEV(d0MassAxisMinMeV),
-			_D0_MASS_AXIS_MAX_MEV(d0MassAxisMaxMeV),
-			_DELTA_M_AXIS_MIN_MEV(deltaMAxisMinMeV),
-			_DELTA_M_AXIS_MAX_MEV(deltaMAxisMaxMeV),
-			_D0_MASS_YAXIS_LABEL(K3PiStudiesUtils::makeYAxisLabel(_NUM_D0_MASS_BINS, _D0_MASS_AXIS_MIN_MEV, _D0_MASS_AXIS_MAX_MEV, "MeV", false)),
-			_DELTA_M_YAXIS_LABEL(K3PiStudiesUtils::makeYAxisLabel(_NUM_DELTA_M_BINS, _DELTA_M_AXIS_MIN_MEV, _DELTA_M_AXIS_MAX_MEV, "MeV", false)),
-			_COMP_D0_MASS_YAXIS_LABEL(K3PiStudiesUtils::makeYAxisLabel(_NUM_D0_MASS_BINS, _D0_MASS_AXIS_MIN_MEV, _D0_MASS_AXIS_MAX_MEV, "MeV", true))
+			double deltaMAxisMaxMeV) : _name_prefix(namePrefix),
+									   _D0_MASS_AXIS_MIN_MEV(d0MassAxisMinMeV),
+									   _D0_MASS_AXIS_MAX_MEV(d0MassAxisMaxMeV),
+									   _DELTA_M_AXIS_MIN_MEV(deltaMAxisMinMeV),
+									   _DELTA_M_AXIS_MAX_MEV(deltaMAxisMaxMeV),
+									   _D0_MASS_YAXIS_LABEL(K3PiStudiesUtils::makeYAxisLabel(_NUM_D0_MASS_BINS, _D0_MASS_AXIS_MIN_MEV, _D0_MASS_AXIS_MAX_MEV, "MeV", false)),
+									   _DELTA_M_YAXIS_LABEL(K3PiStudiesUtils::makeYAxisLabel(_NUM_DELTA_M_BINS, _DELTA_M_AXIS_MIN_MEV, _DELTA_M_AXIS_MAX_MEV, "MeV", false)),
+									   _COMP_D0_MASS_YAXIS_LABEL(K3PiStudiesUtils::makeYAxisLabel(_NUM_D0_MASS_BINS, _D0_MASS_AXIS_MIN_MEV, _D0_MASS_AXIS_MAX_MEV, "MeV", true))
 		{
 			// std::cout << "Pre: " << _name_prefix << std::endl;
 			// std::cout << "test name: " << mABmCD->GetName() << std::endl;
@@ -270,12 +284,66 @@ namespace K3PiStudies
 		CommonHistsWithKinematics &operator=(const CommonHistsWithKinematics &copyMe) = delete;
 		CommonHistsWithKinematics &operator=(CommonHistsWithKinematics &&moveMe) = delete;
 
-		TH1D *const allDeltaMHist = new TH1D(_name_prefix + "allDeltaMHist", K3PiStudiesUtils::makeTitleStr("", _DELTA_M_LABEL, _DELTA_M_YAXIS_LABEL), _NUM_DELTA_M_BINS, _DELTA_M_AXIS_MIN_MEV, _DELTA_M_AXIS_MAX_MEV);
-		TH1D *const allMD0Hist = new TH1D(_name_prefix + "allMD0Hist", K3PiStudiesUtils::makeTitleStr("", _D0_MASS_LABEL, _D0_MASS_YAXIS_LABEL), _NUM_D0_MASS_BINS, _D0_MASS_AXIS_MIN_MEV, _D0_MASS_AXIS_MAX_MEV);
-		TH2D *const allMD0VDeltaMHist = new TH2D(_name_prefix + "allMD0VDeltaMHist", K3PiStudiesUtils::makeTitleStr("", _D0_MASS_LABEL, _DELTA_M_LABEL), _NUM_D0_MASS_BINS, _D0_MASS_AXIS_MIN_MEV, _D0_MASS_AXIS_MAX_MEV, _NUM_DELTA_M_BINS, _DELTA_M_AXIS_MIN_MEV, _DELTA_M_AXIS_MAX_MEV);
-		TH1D *const d0OnlyMD0Hist = new TH1D(_name_prefix + "d0OnlyMD0Hist", K3PiStudiesUtils::makeTitleStr("", _KPIPIPI_MASS_LABEL, _COMP_D0_MASS_YAXIS_LABEL), _NUM_D0_MASS_BINS, _D0_MASS_AXIS_MIN_MEV, _D0_MASS_AXIS_MAX_MEV);
-		TH1D *const d0BarOnlyMD0Hist = new TH1D(_name_prefix + "d0BarOnlyMD0Hist", K3PiStudiesUtils::makeTitleStr("", _KPIPIPI_MASS_LABEL, _COMP_D0_MASS_YAXIS_LABEL), _NUM_D0_MASS_BINS, _D0_MASS_AXIS_MIN_MEV, _D0_MASS_AXIS_MAX_MEV);
-		TH2D *const mABmCD = new TH2D(_name_prefix + "mAB v mCD (passing cutsB)", ";" + _M_AB_LABEL + ";" + _M_CD_LABEL, 50, 550, 1300., 50, 200., 1300.);
+		TH1D *const d0DecayTOverTau = new TH1D(
+			_name_prefix + "d0DecayTOverTau",
+			K3PiStudiesUtils::makeTitleStr("", _D0_DECAY_T_LABEL, K3PiStudiesUtils::makeYAxisLabel(_NUM_D0_DECAY_T_BINS, _D0_DECAY_T_AXIS_MIN, _D0_DECAY_T_AXIS_MAX, "", false)),
+			_NUM_D0_DECAY_T_BINS,
+			_D0_DECAY_T_AXIS_MIN,
+			_D0_DECAY_T_AXIS_MAX);
+		TH1D *const allDeltaMHist = new TH1D(
+			_name_prefix + "allDeltaMHist",
+			K3PiStudiesUtils::makeTitleStr("", _DELTA_M_LABEL, _DELTA_M_YAXIS_LABEL_NO_ZOOM),
+			_NUM_DELTA_M_BINS,
+			K3PiStudiesUtils::_ALL_REGS_DELTAM_AXIS_MIN_MEV,
+			K3PiStudiesUtils::_ALL_REGS_DELTAM_AXIS_MAX_MEV);
+		TH1D *const allMD0Hist = new TH1D(
+			_name_prefix + "allMD0Hist",
+			K3PiStudiesUtils::makeTitleStr("", _D0_MASS_LABEL, _D0_MASS_YAXIS_LABEL_NO_ZOOM),
+			_NUM_D0_MASS_BINS,
+			K3PiStudiesUtils::_ALL_REGS_D0_MASS_AXIS_MIN_MEV,
+			K3PiStudiesUtils::_ALL_REGS_D0_MASS_AXIS_MAX_MEV);
+		TH2D *const allMD0VDeltaMHist = new TH2D(
+			_name_prefix + "allMD0VDeltaMHist",
+			K3PiStudiesUtils::makeTitleStr("", _D0_MASS_LABEL, _DELTA_M_LABEL),
+			_NUM_D0_MASS_BINS,
+			_D0_MASS_AXIS_MIN_MEV,
+			_D0_MASS_AXIS_MAX_MEV,
+			_NUM_DELTA_M_BINS,
+			_DELTA_M_AXIS_MIN_MEV,
+			_DELTA_M_AXIS_MAX_MEV);
+		TH1D *const d0OnlyMD0Hist = new TH1D(
+			_name_prefix + "d0OnlyMD0Hist",
+			K3PiStudiesUtils::makeTitleStr("", _KPIPIPI_MASS_LABEL, _COMP_D0_MASS_YAXIS_LABEL),
+			_NUM_D0_MASS_BINS,
+			_D0_MASS_AXIS_MIN_MEV,
+			_D0_MASS_AXIS_MAX_MEV);
+		TH1D *const d0BarOnlyMD0Hist = new TH1D(
+			_name_prefix + "d0BarOnlyMD0Hist",
+			K3PiStudiesUtils::makeTitleStr("", _KPIPIPI_MASS_LABEL, _COMP_D0_MASS_YAXIS_LABEL),
+			_NUM_D0_MASS_BINS,
+			_D0_MASS_AXIS_MIN_MEV,
+			_D0_MASS_AXIS_MAX_MEV);
+		TH2D *const mABmCD = new TH2D(
+			_name_prefix + "mAB v mCD (passing cutsB)", 
+			";" + _M_AB_LABEL + ";" + _M_CD_LABEL,
+			_NUM_M_AB_BINS,
+			_M_AB_AXIS_MIN_MEV,
+			_M_AB_AXIS_MAX_MEV,
+			_NUM_M_CD_BINS,
+			_M_CD_AXIS_MIN_MEV,
+			_M_CD_AXIS_MAX_MEV);
+		TH1D *const mAB = new TH1D(
+			_name_prefix+"mAB",
+			K3PiStudiesUtils::makeTitleStr("", _M_AB_LABEL, K3PiStudiesUtils::makeYAxisLabel(_NUM_M_AB_BINS, _M_AB_AXIS_MIN_MEV, _M_AB_AXIS_MAX_MEV, "MeV", false)),
+			_NUM_M_AB_BINS,
+			_M_AB_AXIS_MIN_MEV,
+			_M_AB_AXIS_MAX_MEV);
+		TH1D *const mCD = new TH1D(
+			_name_prefix+"mCD",
+			K3PiStudiesUtils::makeTitleStr("", _M_CD_LABEL, K3PiStudiesUtils::makeYAxisLabel(_NUM_M_CD_BINS, _M_CD_AXIS_MIN_MEV, _M_CD_AXIS_MAX_MEV, "MeV", false)),
+			_NUM_M_CD_BINS,
+			_M_CD_AXIS_MIN_MEV,
+			_M_CD_AXIS_MAX_MEV);
 		TH2D *const mKPimPiPi = new TH2D(_name_prefix + "mKPi v mPiPi (passing cutsB)", ";" + _M_AB_LABEL + ";" + _M_CD_LABEL, 50, 550, 1550, 50, 200., 1300.);
 		TH1 *const mCDforKstar = new TH1D(_name_prefix + "mCD for Kstar Region", ";" + _M_CD_LABEL, 110, 200., 1300.);
 		TH1 *const mCDforLowKPiMass = new TH1D(_name_prefix + "mCD for low K,pi mass", ";" + _M_CD_LABEL, 110, 200., 1300.);
@@ -466,7 +534,22 @@ namespace K3PiStudies
 		{
 			TCanvas c1;
 
-			gStyle->SetOptStat("rmen");
+			gStyle->SetOptStat("rme");
+
+			mAB->Draw();
+			c1.SaveAs(outputSubDir+"mAB.png");
+
+			mCD->Draw();
+			c1.SaveAs(outputSubDir+"mCD.png");
+
+			d0DecayTOverTau->Draw();
+			c1.SaveAs(outputSubDir+"d0DecayTOverTau.png");
+
+			cosThetaAHist->Draw();
+			c1.SaveAs(outputSubDir + "cosThetaAHist.png");
+
+			cosThetaCHist->Draw();
+			c1.SaveAs(outputSubDir + "cosThetaCHist.png");
 
 			allMD0Hist->Draw();
 			c1.SaveAs(outputSubDir + "allMD0Hist.png");
@@ -529,7 +612,7 @@ namespace K3PiStudies
 				_D0_STR,
 				_D0_BAR_STR,
 				true,
-				outputSubDir+"compareMD0.png");
+				outputSubDir + "compareMD0.png");
 
 			allMD0VDeltaMHist->Draw("COLZ");
 			c1.SaveAs(outputSubDir + "allMD0VDeltaMHist.png");
@@ -796,12 +879,6 @@ namespace K3PiStudies
 
 			mKPimPiPi->Draw("SURF3");
 			c1.SaveAs(outputSubDir + "mKPimPiPiSurf3.png");
-
-			cosThetaAHist->Draw();
-			c1.SaveAs(outputSubDir + "cosThetaAHist.png");
-
-			cosThetaCHist->Draw();
-			c1.SaveAs(outputSubDir + "cosThetaCHist.png");
 
 			cosThetaAcosThetaCHist->Draw("COLZ");
 			c1.SaveAs(outputSubDir + "cosThetaAcosThetaCHist.png");

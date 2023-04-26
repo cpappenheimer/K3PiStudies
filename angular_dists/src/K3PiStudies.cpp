@@ -65,7 +65,8 @@ namespace K3PiStudies
 									int eventNum,
 									bool verifyAngles,
 									double d0Mass_MeV,
-									double deltaM_MeV)
+									double deltaM_MeV,
+									double d0DecayTime_ps)
 	{
 		std::string evtStr = std::to_string(eventNum);
 
@@ -80,6 +81,8 @@ namespace K3PiStudies
 		{
 			commonHists.d0BarOnlyMD0Hist->Fill(d0Mass_MeV);
 		}
+
+		commonHists.d0DecayTOverTau->Fill(d0DecayTime_ps/K3PiStudiesUtils::_D0_LIFETIME_PS);
 
 		//  The second step is to choose which pi+ to associate with the K- (or CC). We will
 		//  discriminate on the basis of (K,pi) invariant mass.
@@ -190,6 +193,9 @@ namespace K3PiStudies
 		double mABC = pABC_4vec.M();		// m(K*bar,pi-);
 		double mABD = pABD_in_D0CM_MeV.M(); // m(K*bar,pi+);
 		double mCD = pCD_4vec.M();			// m(pi-,pi+);
+
+		commonHists.mAB->Fill(mAB);
+		commonHists.mCD->Fill(mCD);
 
 		if (abs(mAB - 892) < 50)
 		{
@@ -1242,7 +1248,8 @@ namespace K3PiStudies
 													 jentry,
 													 verifyAngles,
 													 myD0_mass,
-													 myDeltaM);
+													 myDeltaM,
+													 decayTime_ps);
 
 			// compare the values from John's code to the ones we calculate here
 			if (comparePhsp)
@@ -1463,7 +1470,8 @@ namespace K3PiStudies
 									  numEvents,
 									  verifyAngles,
 									  _pD0_IN_D0CM_MEV.M(),
-									  0.0); // delta m isn't generated
+									  0.0,
+									  dtime_ps); // delta m isn't generated
 			} // end while loop for event reader
 
 			// DO NOT MANUALLY CLOSE ROOT FILE WITH F->CLOSE() - NOT DOCUMENTED BUT TTREEREADER'S DESTRUCTOR DOES IT ALREADY

@@ -17,7 +17,11 @@ def main():
 
     # list of the root files to process
     # RS
-    filesToProcess = ["/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/randomly_selected_RS_multiple_candidates.root", "/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/selected_rs_single_candidates.root"]
+    filesToProcess = [
+        "/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/randomly_selected_RS_multiple_candidates.root", 
+        "/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/selected_rs_single_candidates.root",
+        "/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2016/randomly_selected_RS_multiple_candidates.root", 
+        "/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2016/selected_rs_single_candidates.root"]
     #filesToProcess = ["/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/selected_rs_single_candidates.root"]
     #filesToProcess = ["/data/home/pappenheimer/d2k3pi_data/selected_data_extended/2015/selected_evts_with_multiple_candidates_2015_MagDown_RS.root"]
 
