@@ -82,7 +82,7 @@ namespace K3PiStudies
 			commonHists.d0BarOnlyMD0Hist->Fill(d0Mass_MeV);
 		}
 
-		commonHists.d0DecayTOverTau->Fill(d0DecayTime_ps/K3PiStudiesUtils::_D0_LIFETIME_PS);
+		commonHists.d0DecayTOverTau->Fill(d0DecayTime_ps / K3PiStudiesUtils::_D0_LIFETIME_PS);
 
 		//  The second step is to choose which pi+ to associate with the K- (or CC). We will
 		//  discriminate on the basis of (K,pi) invariant mass.
@@ -228,14 +228,14 @@ namespace K3PiStudies
 		TVector3 yhatPrime = (pC_3vec.Cross(pD_3vec)).Unit();
 
 		double cosPhi = (yhat.Dot(yhatPrime));
-      	double sinPhi = (xhat.Dot(yhatPrime));
-		double phi = K3PiStudiesUtils::changeAngleRange_0_to_2pi( TMath::ATan2(sinPhi,cosPhi) );
-		double phiDiff = (verifyAngles) ? K3PiStudiesUtils::verifyAngle(yhat, yhatPrime, phi, false, "Event "+evtStr+" phi", printSanityChecks) : 0.0;
+		double sinPhi = (xhat.Dot(yhatPrime));
+		double phi = K3PiStudiesUtils::changeAngleRange_0_to_2pi(TMath::ATan2(sinPhi, cosPhi));
+		double phiDiff = (verifyAngles) ? K3PiStudiesUtils::verifyAngle(yhat, yhatPrime, phi, false, "Event " + evtStr + " phi", printSanityChecks) : 0.0;
 
 		double myPhiDiff = 0.0;
 		if (verifyAngles)
 		{
-			double myPhi = K3PiStudiesUtils::changeAngleRange_0_to_2pi( K3PiStudiesUtils::angleBetweenDecayPlanesKutschke(pA_3vec, pB_3vec, pC_3vec, pD_3vec) );
+			double myPhi = K3PiStudiesUtils::changeAngleRange_0_to_2pi(K3PiStudiesUtils::angleBetweenDecayPlanesKutschke(pA_3vec, pB_3vec, pC_3vec, pD_3vec));
 			myPhiDiff = myPhi - phi;
 		}
 
@@ -404,14 +404,14 @@ namespace K3PiStudies
 		TVector3 yhatAPrime = (pC_3vec.Cross(pB_3vec)).Unit();
 
 		double cosPhiA = (yhatA.Dot(yhatAPrime));
-      	double sinPhiA = (xhatA.Dot(yhatAPrime));
-		double phiA = K3PiStudiesUtils::changeAngleRange_0_to_2pi( TMath::ATan2(sinPhiA,cosPhiA) );
-		double phiDiffA = (verifyAngles) ? K3PiStudiesUtils::verifyAngle(yhatA, yhatAPrime, phiA, false, "Event "+evtStr+" phiA", printSanityChecks) : 0.0;
+		double sinPhiA = (xhatA.Dot(yhatAPrime));
+		double phiA = K3PiStudiesUtils::changeAngleRange_0_to_2pi(TMath::ATan2(sinPhiA, cosPhiA));
+		double phiDiffA = (verifyAngles) ? K3PiStudiesUtils::verifyAngle(yhatA, yhatAPrime, phiA, false, "Event " + evtStr + " phiA", printSanityChecks) : 0.0;
 
 		double myPhiADiff = 0.0;
 		if (verifyAngles)
 		{
-			double myPhiA = K3PiStudiesUtils::changeAngleRange_0_to_2pi( K3PiStudiesUtils::angleBetweenDecayPlanesKutschke(pA_3vec, pD_3vec, pC_3vec, pB_3vec) );
+			double myPhiA = K3PiStudiesUtils::changeAngleRange_0_to_2pi(K3PiStudiesUtils::angleBetweenDecayPlanesKutschke(pA_3vec, pD_3vec, pC_3vec, pB_3vec));
 			myPhiADiff = myPhiA - phiA;
 		}
 
@@ -466,6 +466,26 @@ namespace K3PiStudies
 		else
 		{
 			commonHists.allPhiHistD0bar->Fill(phi);
+		}
+
+		// for testing
+		double sinPhiTest = sin(phi);
+		if (sinPhiTest >= 0.0)
+		{
+			commonHists.testPosSinPhi->Fill(sinPhiTest);
+		}
+		else
+		{
+			commonHists.testNegSinPhi->Fill(sinPhiTest);
+		}
+		double sin2PhiTest = sin(2.0 * phi);
+		if (sin2PhiTest >= 0.0)
+		{
+			commonHists.testPosSin2Phi->Fill(sin2PhiTest);
+		}
+		else
+		{
+			commonHists.testNegSin2Phi->Fill(sin2PhiTest);
 		}
 
 		// look at phi for events in the K*,rho region, separating into D0 and D0bar samples
@@ -630,40 +650,42 @@ namespace K3PiStudies
 			return;
 		}
 
+		std::function<double(double)> sinFunc = [](double phi) -> double
+		{ return sin(phi); }; // have to do this or get unresolved overloaded function type error
+		std::function<double(double)> sin2PhiLambda = [](double phi) -> double
+		{ return sin(2.0 * phi); };
+
 		const double scale = nD0 / nD0bar;
 
-		double nD0Above = 0.0;
-		double nD0barAbove = 0.0;
+		const double nD0Above = K3PiStudiesUtils::countFuncResult(d0Hist, sinFunc, true);
+		const double nD0Below = K3PiStudiesUtils::countFuncResult(d0Hist, sinFunc, false);
+		const std::pair<double, double> D0AB = K3PiStudiesUtils::calcAsymmetry(nD0Above, nD0Below);
+		const double D0AB_asymmetry = D0AB.first;
+		const double D0AB_asymmetryErr = D0AB.second;
 
-		//  change meaning of "Above" and "Below" to refer to  sign(sin(phi)),
-		//  rather than phi above or below pi.
-		for (int bin = 0; bin < 51; bin++)
+		const double nD0barAbove = K3PiStudiesUtils::countFuncResult(d0barHist, sinFunc, true);
+		const double nD0barBelow = K3PiStudiesUtils::countFuncResult(d0barHist, sinFunc, false);
+		const std::pair<double, double> D0barAB = K3PiStudiesUtils::calcAsymmetry(nD0barAbove, nD0barBelow);
+		const double D0barAB_asymmetry = D0barAB.first;
+		const double D0barAB_asymmetryErr = D0barAB.second;
+
+		const std::pair<double, double> CP = K3PiStudiesUtils::invVarWeightedAvg(
+			{D0AB_asymmetry, D0barAB_asymmetry},
+			{D0AB_asymmetryErr, D0barAB_asymmetryErr});
+		const double CPAsymmetry = CP.first;
+		const double CPAsymmetryErr = CP.second;
+
+		const std::pair<double, double> diffABCalc = K3PiStudiesUtils::invVarWeightedAvg(
+			{D0AB_asymmetry, -1.0 * D0barAB_asymmetry},
+			{D0AB_asymmetryErr, D0barAB_asymmetryErr});
+		const double DiffAB = diffABCalc.first;
+		const double DiffABErr = diffABCalc.second;
+		if (CPAsymmetryErr != DiffABErr)
 		{
-			nD0Above = nD0Above + d0Hist->GetBinContent(bin);
-			nD0barAbove = nD0barAbove + d0barHist->GetBinContent(bin);
+			std::cout << "Error calculating asymmetries for " << resName << ", quadrant (" << quadrant << ")!" << std::endl;
+			std::cout << "CP asym error: " << CPAsymmetryErr << std::endl;
+			std::cout << "DiffAB error: " << DiffABErr << std::endl;
 		}
-
-		double nD0Below = 0.0;
-		double nD0barBelow = 0.0;
-
-		for (int bin = 51; bin < 101; bin++)
-		{
-			nD0Below = nD0Below + d0Hist->GetBinContent(bin);
-			nD0barBelow = nD0barBelow + d0barHist->GetBinContent(bin);
-		}
-
-		double D0AB_asymmetry = (nD0Above - nD0Below) / (nD0Above + nD0Below);
-		double D0AB_asymmetryErr = sqrt((1.0 - D0AB_asymmetry * D0AB_asymmetry) / (nD0Above + nD0Below));
-
-		double D0barAB_asymmetry = (nD0barAbove - nD0barBelow) / (nD0barAbove + nD0barBelow);
-		double D0barAB_asymmetryErr = sqrt((1.0 - D0barAB_asymmetry * D0barAB_asymmetry) / (nD0barAbove + nD0barBelow));
-
-		double weight1 = 1. / (D0AB_asymmetryErr * D0AB_asymmetryErr);
-		double weight2 = 1. / (D0barAB_asymmetryErr * D0barAB_asymmetryErr);
-
-		double CPAsymmetry = (D0AB_asymmetry * weight1 + D0barAB_asymmetry * weight2) / (weight1 + weight2);
-		double CPAsymmetryErr = sqrt(1. / (weight1 + weight2));
-		double DiffAB = (D0AB_asymmetry * weight1 - D0barAB_asymmetry * weight2) / (weight1 + weight2);
 
 		if (printStatus)
 		{
@@ -678,60 +700,54 @@ namespace K3PiStudies
 			std::cout << "nD0BarBelow =   " << nD0barBelow << std::endl;
 			std::cout << "D0barAB_asymmetry =   " << D0barAB_asymmetry << "  +-  " << D0barAB_asymmetryErr << std::endl;
 			std::cout << "CP Asymmetry =   " << CPAsymmetry << "  +-  " << CPAsymmetryErr << std::endl;
+			std::cout << "DiffAB =   " << DiffAB << "  +-  " << DiffABErr << std::endl;
 		}
 
-		double nD0Sin2PhiPlus = 0.0;
-		Double_t nD0barSin2PhiPlus = 0.0;
+		const double nD0Sin2PhiPlus = K3PiStudiesUtils::countFuncResult(d0Hist, sin2PhiLambda, true);
+		const double nD0Sin2PhiMinus = K3PiStudiesUtils::countFuncResult(d0Hist, sin2PhiLambda, false);
+		const std::pair<double, double> D0Sin2Phi = K3PiStudiesUtils::calcAsymmetry(nD0Sin2PhiPlus, nD0Sin2PhiMinus);
+		const double D0Sin2Phi_asymmetry = D0Sin2Phi.first;
+		const double D0Sin2Phi_asymmetryErr = D0Sin2Phi.second;
 
-		double nD0Sin2PhiMinus = 0.0;
-		double nD0barSin2PhiMinus = 0.0;
+		const double nD0barSin2PhiPlus = K3PiStudiesUtils::countFuncResult(d0barHist, sin2PhiLambda, true);
+		const double nD0barSin2PhiMinus = K3PiStudiesUtils::countFuncResult(d0barHist, sin2PhiLambda, false);
+		const std::pair<double, double> D0barSin2Phi = K3PiStudiesUtils::calcAsymmetry(nD0barSin2PhiPlus, nD0barSin2PhiMinus);
+		const double D0barSin2Phi_asymmetry = D0barSin2Phi.first;
+		const double D0barSin2Phi_asymmetryErr = D0barSin2Phi.second;
 
-		for (int bin = 1; bin < 26; bin++)
+		const std::pair<double, double> CPSin2Phi = K3PiStudiesUtils::invVarWeightedAvg(
+			{D0Sin2Phi_asymmetry, D0barSin2Phi_asymmetry},
+			{D0Sin2Phi_asymmetryErr, D0barSin2Phi_asymmetryErr});
+		const double Sin2PhiCP_asymmetry = CPSin2Phi.first;
+		const double Sin2PhiCP_asymmetryErr = CPSin2Phi.second;
+
+		const std::pair<double, double> diffSin2PhiCalc = K3PiStudiesUtils::invVarWeightedAvg(
+			{D0Sin2Phi_asymmetry, -1.0 * D0barSin2Phi_asymmetry},
+			{D0Sin2Phi_asymmetryErr, D0barSin2Phi_asymmetryErr});
+		const double DiffSin2Phi = diffSin2PhiCalc.first;
+		const double DiffSin2PhiErr = diffSin2PhiCalc.second;
+		if (Sin2PhiCP_asymmetryErr != DiffSin2PhiErr)
 		{
-			nD0Sin2PhiPlus = nD0Sin2PhiPlus + d0Hist->GetBinContent(bin);
-			nD0barSin2PhiPlus = nD0barSin2PhiPlus + d0barHist->GetBinContent(bin);
+			std::cout << "Error calculating sin 2 phi asymmetries for " << resName << ", quadrant (" << quadrant << ")!" << std::endl;
+			std::cout << "Sin2PhiCP_asymmetry Error: " << Sin2PhiCP_asymmetryErr << std::endl;
+			std::cout << "DiffSin2Phi error: " << DiffSin2PhiErr << std::endl;
 		}
-		for (int bin = 51; bin < 76; bin++)
-		{
-			nD0Sin2PhiPlus = nD0Sin2PhiPlus + d0Hist->GetBinContent(bin);
-			nD0barSin2PhiPlus = nD0barSin2PhiPlus + d0barHist->GetBinContent(bin);
-		}
-		for (int bin = 25; bin < 51; bin++)
-		{
-			nD0Sin2PhiMinus = nD0Sin2PhiMinus + d0Hist->GetBinContent(bin);
-			nD0barSin2PhiMinus = nD0barSin2PhiMinus + d0barHist->GetBinContent(bin);
-		}
-		for (int bin = 75; bin < 101; bin++)
-		{
-			nD0Sin2PhiMinus = nD0Sin2PhiMinus + d0Hist->GetBinContent(bin);
-			nD0barSin2PhiMinus = nD0barSin2PhiMinus + d0barHist->GetBinContent(bin);
-		}
-
-		double D0Sin2Phi_asymmetry = (nD0Sin2PhiPlus - nD0Sin2PhiMinus) / (nD0Sin2PhiPlus + nD0Sin2PhiMinus);
-		double D0Sin2Phi_asymmetryErr = sqrt((1.0 - D0Sin2Phi_asymmetry * D0Sin2Phi_asymmetry) /
-											 (nD0Sin2PhiPlus + nD0Sin2PhiMinus));
-		double D0barSin2Phi_asymmetry = (nD0barSin2PhiPlus - nD0barSin2PhiMinus) /
-										(nD0barSin2PhiPlus + nD0barSin2PhiMinus);
-		double D0barSin2Phi_asymmetryErr = sqrt((1.0 - D0barSin2Phi_asymmetry * D0barSin2Phi_asymmetry) /
-												(nD0barSin2PhiPlus + nD0barSin2PhiMinus));
-
-		weight1 = 1. / (D0Sin2Phi_asymmetryErr * D0Sin2Phi_asymmetryErr);
-		weight2 = 1. / (D0barSin2Phi_asymmetryErr * D0barSin2Phi_asymmetryErr);
-
-		double Sin2PhiCP_asymmetry = (D0Sin2Phi_asymmetry * weight1 + D0barSin2Phi_asymmetry * weight2) /
-									 (weight1 + weight2);
-		double Sin2PhiCP_asymmetryErr = sqrt(1. / (weight1 + weight2));
-
-		double DiffSin2Phi = (D0Sin2Phi_asymmetry * weight1 - D0barSin2Phi_asymmetry * weight2) / (weight1 + weight2);
 
 		if (printStatus)
 		{
-			std::cout << "D0Sin2Phi_asymmetry =  " << D0Sin2Phi_asymmetry << "  +-  " << D0Sin2Phi_asymmetryErr << std::endl;
-			std::cout << "D0barSin2Phi_asymmetry =  " << D0barSin2Phi_asymmetry << "  +-  " << D0barSin2Phi_asymmetryErr << std::endl;
-			std::cout << "Sin2PhiCP_asymmetry =    " << Sin2PhiCP_asymmetry << "  +-  " << Sin2PhiCP_asymmetryErr << std::endl;
+			std::cout << "nD0Sin2PhiPlus =   " << nD0Sin2PhiPlus << std::endl;
+			std::cout << "nD0Sin2PhiMinus =   " << nD0Sin2PhiMinus << std::endl;
+			std::cout << "D0Sin2Phi_asymmetry =   " << D0Sin2Phi_asymmetry << "  +-  " << D0Sin2Phi_asymmetryErr << std::endl;
+
+			std::cout << "nD0barSin2PhiPlus =   " << nD0barSin2PhiPlus << std::endl;
+			std::cout << "nD0barSin2PhiMinus =   " << nD0barSin2PhiMinus << std::endl;
+			std::cout << "D0barSin2Phi_asymmetry =   " << D0barSin2Phi_asymmetry << "  +-  " << D0barSin2Phi_asymmetryErr << std::endl;
+
+			std::cout << "Sin2PhiCP_asymmetry =   " << Sin2PhiCP_asymmetry << "  +-  " << Sin2PhiCP_asymmetryErr << std::endl;
+			std::cout << "DiffSin2Phi =   " << DiffSin2Phi << "  +-  " << DiffSin2PhiErr << std::endl;
 		}
 
-		double maximum = d0barHist->GetMaximum();
+		const double maximum = d0barHist->GetMaximum();
 		if (printStatus)
 		{
 			std::cout << "max from " << d0barHist->GetName() << " = " << maximum << std::endl;
@@ -748,7 +764,7 @@ namespace K3PiStudies
 		d0barHist->Scale(1.00 / nD0bar);
 
 		TCanvas c1;
-		
+
 		d0Hist->GetYaxis()->SetRangeUser(0., 1.25 * maximum / nD0);
 		d0Hist->GetXaxis()->SetTitleSize(0.06);
 		d0Hist->GetXaxis()->SetTitleOffset(0.75);
@@ -767,7 +783,7 @@ namespace K3PiStudies
 		leg.AddEntry(d0Hist, "D^{0}", "L");
 		leg.AddEntry(d0barHist, "#bar{D}^{0}", "L");
 		leg.Draw("same");
-		
+
 		TString nd0Str = std::to_string(nD0);
 		TString nd0barStr = std::to_string(nD0bar);
 		TString d0AsymStr;
@@ -818,7 +834,6 @@ namespace K3PiStudies
 		CommonHistsWithKinematics &commonHists,
 		const TString &outputSubDir,
 		const std::pair<double, double> &decayTimeLimits_ps,
-		bool applyDecayTimeCut,
 		bool applyMikeCuts,
 		const std::string &mode,
 		bool usingCTau,
@@ -827,7 +842,7 @@ namespace K3PiStudies
 		const std::string &varType,
 		bool comparePhsp,
 		bool verifyAngles,
-		const std::string& region)
+		const std::string &region)
 	{
 		if (fChain == 0)
 			return;
@@ -844,7 +859,7 @@ namespace K3PiStudies
 		double maxM34Diff = 0.0;
 		double maxCos12Diff = 0.0;
 		double maxCos34Diff = 0.0;
-		double maxPhiDiff = 0.0; 
+		double maxPhiDiff = 0.0;
 
 		double maxPhiCompDiff = 0.0;
 		double maxPhiACompDiff = 0.0;
@@ -1001,25 +1016,16 @@ namespace K3PiStudies
 			}
 
 			// check if it is in the m, delta m region we are interested in
-			if ( !K3PiStudiesUtils::isInD0MassRegion(region, myD0_mass) )
+			if (!K3PiStudiesUtils::isInD0MassRegion(region, myD0_mass))
 			{
 				continue;
 			}
-			if ( !K3PiStudiesUtils::isInDeltaMRegion(region, myDeltaM) )
+			if (!K3PiStudiesUtils::isInDeltaMRegion(region, myDeltaM))
 			{
 				continue;
 			}
 
-			// decay time cut is only used if not processing in decay time bins
-			bool passesDecayTimeCut;
-			if (applyDecayTimeCut)
-			{
-				passesDecayTimeCut = decayTime_ps > _D0_LIFETIME_CUT_PS;
-			}
-			else
-			{
-				passesDecayTimeCut = true;
-			}
+			bool passesDecayTimeCut = decayTime_ps > _D0_LIFETIME_CUT_PS;
 
 			// Mike's cuts start here
 			if (applyMikeCuts)
@@ -1328,7 +1334,8 @@ namespace K3PiStudies
 		std::cout << numRS << " RS events were processed." << std::endl;
 		std::cout << numRSPass << " RS events were selected." << std::endl;
 		std::cout << numWS << " WS events were processed." << std::endl;
-		std::cout << numWSPass << " WS events were selected." << std::endl << std::endl;
+		std::cout << numWSPass << " WS events were selected." << std::endl
+				  << std::endl;
 
 		if (comparePhsp)
 		{
@@ -1337,7 +1344,8 @@ namespace K3PiStudies
 			std::cout << "Max diff between m34 values: " << maxM34Diff << std::endl;
 			std::cout << "Max diff between cos12 values: " << maxCos12Diff << std::endl;
 			std::cout << "Max diff between cos34 values: " << maxCos34Diff << std::endl;
-			std::cout << "Didn't compare phi values." << std::endl << std::endl;
+			std::cout << "Didn't compare phi values." << std::endl
+					  << std::endl;
 		}
 
 		if (verifyAngles)
@@ -1345,7 +1353,8 @@ namespace K3PiStudies
 			std::cout << "Max diff between our computed phi and phi from .Angle(): " << maxPhiCompDiff << std::endl;
 			std::cout << "Max diff between our computed phiA and phiA from .Angle(): " << maxPhiACompDiff << std::endl;
 			std::cout << "Max diff between our computed phi and phi from Kutschke equation: " << maxPhiCompDiff2 << std::endl;
-			std::cout << "Max diff between our computed phiA and phiA from Kutschke equation: " << maxPhiACompDiff2 << std::endl << std::endl;
+			std::cout << "Max diff between our computed phiA and phiA from Kutschke equation: " << maxPhiACompDiff2 << std::endl
+					  << std::endl;
 		}
 	}
 
@@ -1353,10 +1362,9 @@ namespace K3PiStudies
 		CommonHistsWithKinematics &commonHists,
 		const std::vector<std::string> &inputFiles,
 		const std::pair<double, double> &decayTimeLimits_ps,
-		bool applyDecayTimeCut,
 		bool printSanityChecks,
 		bool verifyAngles,
-		const std::string& region)
+		const std::string &region)
 	{
 		std::cout << "WARNING: TOY MC PROCESSING CODE HAS NOT BEEN TESTED!!!" << std::endl;
 
@@ -1440,17 +1448,14 @@ namespace K3PiStudies
 
 				numEvents++;
 
-				// add cut on decay time to duplicate what is done for data (only used if not processing in decay time bins)
-				if (applyDecayTimeCut)
+				// add cut on decay time to duplicate what is done for data
+				if (dtime_ps <= K3PiStudies::_D0_LIFETIME_CUT_PS)
 				{
-					if (dtime_ps <= K3PiStudies::_D0_LIFETIME_CUT_PS)
-					{
-						continue;
-					}
+					continue;
 				}
 
 				// apply cut on D0 mass to look at region selected. Can't do delta M cut - value not saved in toy MC ntuples
-				if ( !K3PiStudiesUtils::isInD0MassRegion(region, mD0_MeV) )
+				if (!K3PiStudiesUtils::isInD0MassRegion(region, mD0_MeV))
 				{
 					continue;
 				}
@@ -1472,7 +1477,7 @@ namespace K3PiStudies
 									  _pD0_IN_D0CM_MEV.M(),
 									  0.0,
 									  dtime_ps); // delta m isn't generated
-			} // end while loop for event reader
+			}									 // end while loop for event reader
 
 			// DO NOT MANUALLY CLOSE ROOT FILE WITH F->CLOSE() - NOT DOCUMENTED BUT TTREEREADER'S DESTRUCTOR DOES IT ALREADY
 		} // end loop over input files
@@ -1662,7 +1667,7 @@ int main(int argc, char *argv[])
 		const TString histNamePrefix = (processInDecayTimeBins) ? "t bin " + std::to_string(d) : "";
 
 		// create hists
-		
+
 		K3PiStudies::CommonHistsWithKinematics commonHists(
 			histNamePrefix,
 			regAxisBoundsMD0MeV.first,
@@ -1670,12 +1675,9 @@ int main(int argc, char *argv[])
 			regAxisBoundsDeltaMMeV.first,
 			regAxisBoundsDeltaMMeV.second);
 
-		// only apply decay time cut if not processing in decay time bins
-		bool applyDecayTimeCut = processInDecayTimeBins ? false : true;
-
 		if (isToyMC)
 		{
-			K3PiStudies::processToyMC(commonHists, inRootFiles, decayTimeLims_ps[d], applyDecayTimeCut, printSanityChecks, verifyAngles, region);
+			K3PiStudies::processToyMC(commonHists, inRootFiles, decayTimeLims_ps[d], printSanityChecks, verifyAngles, region);
 		}
 		else
 		{
@@ -1689,7 +1691,6 @@ int main(int argc, char *argv[])
 				commonHists,
 				outputSubDir.string(),
 				decayTimeLims_ps[d],
-				applyDecayTimeCut,
 				applyMikeCuts,
 				mode,
 				usingCTau,
@@ -1699,6 +1700,30 @@ int main(int argc, char *argv[])
 				comparePhsp,
 				verifyAngles,
 				region);
+		}
+
+		if (printSanityChecks)
+		{
+			std::function<double(double)> sinFunc = [](double phi) -> double
+			{ return sin(phi); }; // have to do this or get unresolved overloaded function type error
+			std::function<double(double)> sin2PhiLambda = [](double phi) -> double
+			{ return sin(2.0 * phi); };
+
+			std::cout << "Num phi: " << int(commonHists.allPhiHist->GetEntries()) << std::endl;
+
+			int numPosSinComputed = K3PiStudies::K3PiStudiesUtils::countFuncResult(commonHists.allPhiHist, sinFunc, true);
+			int numNegSinComputed = K3PiStudies::K3PiStudiesUtils::countFuncResult(commonHists.allPhiHist, sinFunc, false);
+			std::cout << "Num positive sin phi: " << int(commonHists.testPosSinPhi->GetEntries()) << std::endl;
+			std::cout << "Num negative sin phi: " << int(commonHists.testNegSinPhi->GetEntries()) << std::endl;
+			std::cout << "Num positive sin phi computed: " << numPosSinComputed << std::endl;
+			std::cout << "Num negative sin phi computed: " << numNegSinComputed << std::endl;
+
+			int numPosSin2Computed = K3PiStudies::K3PiStudiesUtils::countFuncResult(commonHists.allPhiHist, sin2PhiLambda, true);
+			int numNegSin2Computed = K3PiStudies::K3PiStudiesUtils::countFuncResult(commonHists.allPhiHist, sin2PhiLambda, false);
+			std::cout << "Num positive sin 2 phi: " << int(commonHists.testPosSin2Phi->GetEntries()) << std::endl;
+			std::cout << "Num negative sin 2 phi: " << int(commonHists.testNegSin2Phi->GetEntries()) << std::endl;
+			std::cout << "Num positive sin 2 phi computed: " << numPosSin2Computed << std::endl;
+			std::cout << "Num negative sin 2 phi computed: " << numNegSin2Computed << std::endl;
 		}
 
 		gStyle->SetOptStat(0);

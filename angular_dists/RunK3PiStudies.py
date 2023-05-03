@@ -52,7 +52,7 @@ def main():
     comparePhsp = False
 
     # Set to true to print info for the first event
-    printSanityChecks = False
+    printSanityChecks = True
 
     # Set to true if want to check that our calculated angles between vectors match results of ROOT's .Angle method
     verifyAngles = False

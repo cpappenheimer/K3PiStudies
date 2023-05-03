@@ -222,6 +222,16 @@ namespace K3PiStudies
 	class CommonHistsWithKinematics final
 	{
 	private:
+		const TString _name_prefix;
+		const double _D0_MASS_AXIS_MIN_MEV;
+		const double _D0_MASS_AXIS_MAX_MEV;
+		const double _DELTA_M_AXIS_MIN_MEV;
+		const double _DELTA_M_AXIS_MAX_MEV;
+		const TString _D0_MASS_YAXIS_LABEL;
+		const TString _DELTA_M_YAXIS_LABEL;
+		const TString _COMP_D0_MASS_YAXIS_LABEL;
+
+	public:
 		static const unsigned int _NUM_D0_MASS_BINS = 120;
 		static const unsigned int _NUM_DELTA_M_BINS = 80;
 		static const unsigned int _NUM_M_AB_BINS = 50;
@@ -234,7 +244,8 @@ namespace K3PiStudies
 		static constexpr double _M_CD_AXIS_MAX_MEV = 1300.0;
 		static const unsigned int _NUM_D0_DECAY_T_BINS = 80;
 		static constexpr double _D0_DECAY_T_AXIS_MIN = 0.0;
-		static constexpr double _D0_DECAY_T_AXIS_MAX = 8.0;
+		static constexpr double _D0_DECAY_T_AXIS_MAX = 10.0;
+		static const unsigned int _NUM_PHI_BINS = 100;
 
 		static inline const TString _D0_STR = "D^{0}";
 		static inline const TString _D0_BAR_STR = "#bar{D^{0}}";
@@ -251,16 +262,6 @@ namespace K3PiStudies
 		static inline const TString _D0_MASS_YAXIS_LABEL_NO_ZOOM = K3PiStudiesUtils::makeYAxisLabel(_NUM_D0_MASS_BINS, K3PiStudiesUtils::_ALL_REGS_D0_MASS_AXIS_MIN_MEV, K3PiStudiesUtils::_ALL_REGS_D0_MASS_AXIS_MAX_MEV, "MeV", false);
 		static inline const TString _DELTA_M_YAXIS_LABEL_NO_ZOOM = K3PiStudiesUtils::makeYAxisLabel(_NUM_DELTA_M_BINS, K3PiStudiesUtils::_ALL_REGS_DELTAM_AXIS_MIN_MEV, K3PiStudiesUtils::_ALL_REGS_DELTAM_AXIS_MAX_MEV, "MeV", false);
 
-		const TString _name_prefix;
-		const double _D0_MASS_AXIS_MIN_MEV;
-		const double _D0_MASS_AXIS_MAX_MEV;
-		const double _DELTA_M_AXIS_MIN_MEV;
-		const double _DELTA_M_AXIS_MAX_MEV;
-		const TString _D0_MASS_YAXIS_LABEL;
-		const TString _DELTA_M_YAXIS_LABEL;
-		const TString _COMP_D0_MASS_YAXIS_LABEL;
-
-	public:
 		CommonHistsWithKinematics(
 			const TString &namePrefix,
 			double d0MassAxisMinMeV,
@@ -284,6 +285,30 @@ namespace K3PiStudies
 		CommonHistsWithKinematics &operator=(const CommonHistsWithKinematics &copyMe) = delete;
 		CommonHistsWithKinematics &operator=(CommonHistsWithKinematics &&moveMe) = delete;
 
+		TH1D *const testPosSinPhi = new TH1D(
+			_name_prefix + "testPosSinPhi",
+			K3PiStudiesUtils::makeTitleStr("", "", ""),
+			_NUM_PHI_BINS,
+			0.0,
+			1.0);
+		TH1D *const testNegSinPhi = new TH1D(
+			_name_prefix + "testNegSinPhi",
+			K3PiStudiesUtils::makeTitleStr("", "", ""),
+			_NUM_PHI_BINS,
+			-1.0,
+			0.0);
+		TH1D *const testPosSin2Phi = new TH1D(
+			_name_prefix + "testPosSin2Phi",
+			K3PiStudiesUtils::makeTitleStr("", "", ""),
+			_NUM_PHI_BINS,
+			0.0,
+			1.0);
+		TH1D *const testNegSin2Phi = new TH1D(
+			_name_prefix + "testNegSin2Phi",
+			K3PiStudiesUtils::makeTitleStr("", "", ""),
+			_NUM_PHI_BINS,
+			-1.0,
+			0.0);
 		TH1D *const d0DecayTOverTau = new TH1D(
 			_name_prefix + "d0DecayTOverTau",
 			K3PiStudiesUtils::makeTitleStr("", _D0_DECAY_T_LABEL, K3PiStudiesUtils::makeYAxisLabel(_NUM_D0_DECAY_T_BINS, _D0_DECAY_T_AXIS_MIN, _D0_DECAY_T_AXIS_MAX, "", false)),
@@ -324,7 +349,7 @@ namespace K3PiStudies
 			_D0_MASS_AXIS_MIN_MEV,
 			_D0_MASS_AXIS_MAX_MEV);
 		TH2D *const mABmCD = new TH2D(
-			_name_prefix + "mAB v mCD (passing cutsB)", 
+			_name_prefix + "mAB v mCD (passing cutsB)",
 			";" + _M_AB_LABEL + ";" + _M_CD_LABEL,
 			_NUM_M_AB_BINS,
 			_M_AB_AXIS_MIN_MEV,
@@ -333,13 +358,13 @@ namespace K3PiStudies
 			_M_CD_AXIS_MIN_MEV,
 			_M_CD_AXIS_MAX_MEV);
 		TH1D *const mAB = new TH1D(
-			_name_prefix+"mAB",
+			_name_prefix + "mAB",
 			K3PiStudiesUtils::makeTitleStr("", _M_AB_LABEL, K3PiStudiesUtils::makeYAxisLabel(_NUM_M_AB_BINS, _M_AB_AXIS_MIN_MEV, _M_AB_AXIS_MAX_MEV, "MeV", false)),
 			_NUM_M_AB_BINS,
 			_M_AB_AXIS_MIN_MEV,
 			_M_AB_AXIS_MAX_MEV);
 		TH1D *const mCD = new TH1D(
-			_name_prefix+"mCD",
+			_name_prefix + "mCD",
 			K3PiStudiesUtils::makeTitleStr("", _M_CD_LABEL, K3PiStudiesUtils::makeYAxisLabel(_NUM_M_CD_BINS, _M_CD_AXIS_MIN_MEV, _M_CD_AXIS_MAX_MEV, "MeV", false)),
 			_NUM_M_CD_BINS,
 			_M_CD_AXIS_MIN_MEV,
@@ -349,49 +374,49 @@ namespace K3PiStudies
 		TH1 *const mCDforLowKPiMass = new TH1D(_name_prefix + "mCD for low K,pi mass", ";" + _M_CD_LABEL, 110, 200., 1300.);
 		TH1 *const mABforRhoZero = new TH1D(_name_prefix + "mAB for Rho Region", ";" + _M_AB_LABEL, 70, 550, 1250);
 		TH2D *const cosVsinPlot = new TH2D(_name_prefix + "cos phi v sin phi Sanity Plot", ";cos(#phi);sin(#phi)", 50, -1.5, 1.5, 50, -1.5, 1.5);
-		TH1 *const allPhiHist = new TH1D(_name_prefix + "Phi (passing cutsB)", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const allPhiHistD0 = new TH1D(_name_prefix + "Phi for D0 (passing cutsB)", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const allPhiHistD0bar = new TH1D(_name_prefix + "Phi for D0bar (passing cutsB)", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const allPhiHist = new TH1D(_name_prefix + "Phi (passing cutsB)", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const allPhiHistD0 = new TH1D(_name_prefix + "Phi for D0 (passing cutsB)", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const allPhiHistD0bar = new TH1D(_name_prefix + "Phi for D0bar (passing cutsB)", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
 		TH1D *const cosThetaAHist = new TH1D(_name_prefix + "cosThetaA (passing cuts B)", ";" + _COS_THETA_A_LABEL, 100, -1., 1.);
 		TH1D *const cosThetaCHist = new TH1D(_name_prefix + "cosThetaC (passing cuts B)", ";" + _COS_THETA_C_LABEL, 100, -1., 1.);
 		TH2D *const cosThetaAcosThetaCHist = new TH2D(_name_prefix + "cosThetaA v cosThetaC (passing cutsB)", ";" + _COS_THETA_A_LABEL + ";" + _COS_THETA_C_LABEL, 100, -1., 1., 100, -1., 1.);
-		TH1 *const allPhiHistD02KstarRho = new TH1D(_name_prefix + "Phi for D02KstarRho (passing cutsB)", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad1PhiHistD02KstarRho = new TH1D(_name_prefix + "Quad1 phi for D02KstarRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad2PhiHistD02KstarRho = new TH1D(_name_prefix + "Quad2 phi for D02KstarRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad3PhiHistD02KstarRho = new TH1D(_name_prefix + "Quad3 phi for D02KstarRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad4PhiHistD02KstarRho = new TH1D(_name_prefix + "Quad4 phi for D02KstarRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const allPhiHistD02KstarRho = new TH1D(_name_prefix + "Phi for D02KstarRho (passing cutsB)", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad1PhiHistD02KstarRho = new TH1D(_name_prefix + "Quad1 phi for D02KstarRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad2PhiHistD02KstarRho = new TH1D(_name_prefix + "Quad2 phi for D02KstarRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad3PhiHistD02KstarRho = new TH1D(_name_prefix + "Quad3 phi for D02KstarRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad4PhiHistD02KstarRho = new TH1D(_name_prefix + "Quad4 phi for D02KstarRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
 		TH2D *const tAtCD02KstarRho = new TH2D(_name_prefix + "cosThetaA v cosThetaC for D0 at KstarRho", ";" + _COS_THETA_A_LABEL + ";" + _COS_THETA_C_LABEL, 100, -1., 1., 100, -1., 1.);
-		TH1 *const allPhiHistD0bar2KstarRho = new TH1D(_name_prefix + "Phi for D0bar2KstarRho (passing cutsB)", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad1PhiHistD0bar2KstarRho = new TH1D(_name_prefix + "Quad1 phi for D0bar2KstarRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad2PhiHistD0bar2KstarRho = new TH1D(_name_prefix + "Quad2 phi for D0bar2KstarRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad3PhiHistD0bar2KstarRho = new TH1D(_name_prefix + "Quad3 phi for D0bar2KstarRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad4PhiHistD0bar2KstarRho = new TH1D(_name_prefix + "Quad4 phi for D0bar2KstarRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const allPhiHistD0bar2KstarRho = new TH1D(_name_prefix + "Phi for D0bar2KstarRho (passing cutsB)", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad1PhiHistD0bar2KstarRho = new TH1D(_name_prefix + "Quad1 phi for D0bar2KstarRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad2PhiHistD0bar2KstarRho = new TH1D(_name_prefix + "Quad2 phi for D0bar2KstarRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad3PhiHistD0bar2KstarRho = new TH1D(_name_prefix + "Quad3 phi for D0bar2KstarRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad4PhiHistD0bar2KstarRho = new TH1D(_name_prefix + "Quad4 phi for D0bar2KstarRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
 		TH2D *const tAtCD0bar2KstarRho = new TH2D(_name_prefix + "cosThetaA v cosThetaC for D0bar at KstarRho", ";" + _COS_THETA_A_LABEL + ";" + _COS_THETA_C_LABEL, 100, -1., 1., 100, -1., 1.);
-		TH1 *const allPhiHistD02KstarF0 = new TH1D(_name_prefix + "Phi for D02KstarF0 (passing cutsB)", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad1PhiHistD02KstarF0 = new TH1D(_name_prefix + "Quad1 phi for D02KstarF0", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad2PhiHistD02KstarF0 = new TH1D(_name_prefix + "Quad2 phi for D02KstarF0", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad3PhiHistD02KstarF0 = new TH1D(_name_prefix + "Quad3 phi for D02KstarF0", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad4PhiHistD02KstarF0 = new TH1D(_name_prefix + "Quad4 phi for D02KstarF0", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const allPhiHistD02KstarF0 = new TH1D(_name_prefix + "Phi for D02KstarF0 (passing cutsB)", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad1PhiHistD02KstarF0 = new TH1D(_name_prefix + "Quad1 phi for D02KstarF0", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad2PhiHistD02KstarF0 = new TH1D(_name_prefix + "Quad2 phi for D02KstarF0", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad3PhiHistD02KstarF0 = new TH1D(_name_prefix + "Quad3 phi for D02KstarF0", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad4PhiHistD02KstarF0 = new TH1D(_name_prefix + "Quad4 phi for D02KstarF0", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
 		TH2D *const tAtCD02KstarF0 = new TH2D(_name_prefix + "cosThetaA v cosThetaC for D0 at KstarF0", ";" + _COS_THETA_A_LABEL + ";" + _COS_THETA_C_LABEL, 100, -1., 1., 100, -1., 1.);
-		TH1 *const allPhiHistD0bar2KstarF0 = new TH1D(_name_prefix + "Phi for D0bar2KstarF0 (passing cutsB)", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad1PhiHistD0bar2KstarF0 = new TH1D(_name_prefix + "Quad1 phi for D0bar2KstarF0", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad2PhiHistD0bar2KstarF0 = new TH1D(_name_prefix + "Quad2 phi for D0bar2KstarF0", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad3PhiHistD0bar2KstarF0 = new TH1D(_name_prefix + "Quad3 phi for D0bar2KstarF0", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad4PhiHistD0bar2KstarF0 = new TH1D(_name_prefix + "Quad4 phi for D0bar2KstarF0", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const allPhiHistD0bar2KstarF0 = new TH1D(_name_prefix + "Phi for D0bar2KstarF0 (passing cutsB)", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad1PhiHistD0bar2KstarF0 = new TH1D(_name_prefix + "Quad1 phi for D0bar2KstarF0", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad2PhiHistD0bar2KstarF0 = new TH1D(_name_prefix + "Quad2 phi for D0bar2KstarF0", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad3PhiHistD0bar2KstarF0 = new TH1D(_name_prefix + "Quad3 phi for D0bar2KstarF0", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad4PhiHistD0bar2KstarF0 = new TH1D(_name_prefix + "Quad4 phi for D0bar2KstarF0", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
 		TH2D *const tAtCD0bar2KstarF0 = new TH2D(_name_prefix + "cosThetaA v cosThetaC for D0bar at KstarF0", ";" + _COS_THETA_A_LABEL + ";" + _COS_THETA_C_LABEL, 100, -1., 1., 100, -1., 1.);
-		TH1 *const allPhiHistD02KappaRho = new TH1D(_name_prefix + "Phi for D02KappaRho (passing cutsB)", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad1PhiHistD02KappaRho = new TH1D(_name_prefix + "Quad1 phi for D02KappaRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad2PhiHistD02KappaRho = new TH1D(_name_prefix + "Quad2 phi for D02KappaRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad3PhiHistD02KappaRho = new TH1D(_name_prefix + "Quad3 phi for D02KappaRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad4PhiHistD02KappaRho = new TH1D(_name_prefix + "Quad4 phi for D02KappaRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const allPhiHistD02KappaRho = new TH1D(_name_prefix + "Phi for D02KappaRho (passing cutsB)", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad1PhiHistD02KappaRho = new TH1D(_name_prefix + "Quad1 phi for D02KappaRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad2PhiHistD02KappaRho = new TH1D(_name_prefix + "Quad2 phi for D02KappaRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad3PhiHistD02KappaRho = new TH1D(_name_prefix + "Quad3 phi for D02KappaRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad4PhiHistD02KappaRho = new TH1D(_name_prefix + "Quad4 phi for D02KappaRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
 		TH2D *const tAtCD02KappaRho = new TH2D(_name_prefix + "cosThetaA v cosThetaC for D0 at KappaRho", ";" + _COS_THETA_A_LABEL + ";" + _COS_THETA_C_LABEL, 100, -1., 1., 100, -1., 1.);
-		TH1 *const allPhiHistD0bar2KappaRho = new TH1D(_name_prefix + "Phi for D0bar2KappaRho (passing cutsB)", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad1PhiHistD0bar2KappaRho = new TH1D(_name_prefix + "Quad1 phi for D0bar2KappaRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad2PhiHistD0bar2KappaRho = new TH1D(_name_prefix + "Quad2 phi for D0bar2KappaRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad3PhiHistD0bar2KappaRho = new TH1D(_name_prefix + "Quad3 phi for D0bar2KappaRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
-		TH1 *const quad4PhiHistD0bar2KappaRho = new TH1D(_name_prefix + "Quad4 phi for D0bar2KappaRho", ";#phi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const allPhiHistD0bar2KappaRho = new TH1D(_name_prefix + "Phi for D0bar2KappaRho (passing cutsB)", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad1PhiHistD0bar2KappaRho = new TH1D(_name_prefix + "Quad1 phi for D0bar2KappaRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad2PhiHistD0bar2KappaRho = new TH1D(_name_prefix + "Quad2 phi for D0bar2KappaRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad3PhiHistD0bar2KappaRho = new TH1D(_name_prefix + "Quad3 phi for D0bar2KappaRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const quad4PhiHistD0bar2KappaRho = new TH1D(_name_prefix + "Quad4 phi for D0bar2KappaRho", ";#phi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
 		TH2D *const tAtCD0bar2KappaRho = new TH2D(_name_prefix + "cosThetaA v cosThetaC for D0bar at KappaRho", ";" + _COS_THETA_A_LABEL + ";" + _COS_THETA_C_LABEL, 100, -1., 1., 100, -1., 1.);
-		TH1 *const allPhiAHist = new TH1D(_name_prefix + "phi", "cutsB; low-mass K,pi", 100, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH1 *const allPhiAHist = new TH1D(_name_prefix + "phi", "cutsB; low-mass K,pi", _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
 		TH2D *const cosVsinPlotA = new TH2D(_name_prefix + "cosine v sine", "sanity plotA ", 50, -1.5, 1.5, 50, -1.5, 1.5);
 		TH2D *const mABmCDForLowKPiPi = new TH2D(_name_prefix + "mAB_v_mCD for Low KPiPi", "passing cutsB", 50, 550, 1300., 50, 200., 1300.);
 		TH2D *const mADmCB = new TH2D(_name_prefix + "mAD_v_mCB", "passing cutsB", 50, 550, 1550, 50, 200., 1300.);
@@ -432,7 +457,7 @@ namespace K3PiStudies
 		TH2D *const KstarPiPiDP1213 = new TH2D(_name_prefix + "K*,pi-,pi+ DP, s12,s13", "K* +- 50 MeV", 50, 1.0, 2.8, 50, 1.0, 2.8);
 		TH2D *const KstarPiPiDP2313 = new TH2D(_name_prefix + "K*,pi-,pi+ DP, s23,s13", "K* +- 50 MeV", 50, 0.0, 1.2, 50, 1.0, 2.8);
 		TH2D *const KstarPiPiDP2312 = new TH2D(_name_prefix + "K*,pi-,pi+ DP, s23,s12", "K* +- 50 MeV", 50, 0.0, 1.2, 50, 1.0, 2.8);
-		TH2D *const sanityPlot = new TH2D(_name_prefix + "for all events", "tripleProduct v phi", 100, -600., 600., 100, 0., 2.0 * K3PiStudiesUtils::_PI);
+		TH2D *const sanityPlot = new TH2D(_name_prefix + "for all events", "tripleProduct v phi", 100, -600., 600., _NUM_PHI_BINS, 0., 2.0 * K3PiStudiesUtils::_PI);
 		TH2D *const mKPimPiPiA = new TH2D(_name_prefix + "at higher decay time", "mKPi v mPiPi", 50, 550, 1550, 50, 200., 1300.);
 
 		// the call to TFile->Close() in main in K3PiStudies.cpp seems to delete the hists so don't need this (BAD)
@@ -536,14 +561,30 @@ namespace K3PiStudies
 
 			gStyle->SetOptStat("rme");
 
+			testPosSinPhi->Draw();
+			c1.SaveAs(outputSubDir + "testPosSinPhi.png");
+
+			testNegSinPhi->Draw();
+			c1.SaveAs(outputSubDir + "testNegSinPhi.png");
+
+			testPosSin2Phi->Draw();
+			c1.SaveAs(outputSubDir + "testPosSin2Phi.png");
+
+			testNegSin2Phi->Draw();
+			c1.SaveAs(outputSubDir + "testNegSin2Phi.png");
+
 			mAB->Draw();
-			c1.SaveAs(outputSubDir+"mAB.png");
+			c1.SaveAs(outputSubDir + "mAB.png");
 
 			mCD->Draw();
-			c1.SaveAs(outputSubDir+"mCD.png");
+			c1.SaveAs(outputSubDir + "mCD.png");
 
 			d0DecayTOverTau->Draw();
-			c1.SaveAs(outputSubDir+"d0DecayTOverTau.png");
+			c1.SaveAs(outputSubDir + "d0DecayTOverTau.png");
+			// semilog
+			c1.SetLogy(1);
+			c1.SaveAs(outputSubDir + "d0DecayTOverTau_semilog.png");
+			c1.SetLogy(0);
 
 			cosThetaAHist->Draw();
 			c1.SaveAs(outputSubDir + "cosThetaAHist.png");
@@ -616,6 +657,16 @@ namespace K3PiStudies
 
 			allMD0VDeltaMHist->Draw("COLZ");
 			c1.SaveAs(outputSubDir + "allMD0VDeltaMHist.png");
+			// log color scale
+			gPad->SetLogz(1);
+			c1.SaveAs(outputSubDir + "allMD0VDeltaMHist_logColor.png");
+			gPad->SetLogz(0);
+			// capped linear scale
+			double allMD0VDeltaMHistMax = allMD0VDeltaMHist->GetMaximum();
+			allMD0VDeltaMHist->SetMaximum(allMD0VDeltaMHistMax / 10.0);
+			allMD0VDeltaMHist->Draw("COLZ");
+			c1.SaveAs(outputSubDir + "allMD0VDeltaMHist_capped.png");
+			allMD0VDeltaMHist->SetMaximum(allMD0VDeltaMHistMax);
 
 			mABmAD->GetXaxis()->SetTitleSize(0.05);
 			mABmAD->GetXaxis()->SetTitleOffset(0.90);

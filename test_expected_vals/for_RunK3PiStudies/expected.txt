@@ -1,0 +1,57 @@
+Partial expected output for the run command:
+../build/angular_dists/src/K3PiStudies -f /share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/randomly_selected_RS_multiple_candidates.root,/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/selected_rs_single_candidates.root,/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2016/randomly_selected_RS_multiple_candidates.root,/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2016/selected_rs_single_candidates.root -o /share/lazy/pappenheimer/d2k3pi/plotting/angular_dist_plots -m RS -v REFIT -r ALL --useLHCbStyle --printSanityChecks
+
+
+Processing data with the following options: 
+Is toy MC: false
+Mode: RS
+Region: ALL
+Daughter variable type: REFIT
+Files: /share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/randomly_selected_RS_multiple_candidates.root,/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/selected_rs_single_candidates.root,/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2016/randomly_selected_RS_multiple_candidates.root,/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2016/selected_rs_single_candidates.root
+Output directory: /share/lazy/pappenheimer/d2k3pi/plotting/angular_dist_plots
+Processing in decay time bins: false
+Applying Mike's cuts: false
+Using c*tau: false
+Using LHCb style: true
+Comparing phase space calculations: false
+Printing sanity checks: true
+Verifying angles: false
+
+LHCb style: TODO
+
+For decay time bin: -inf <= D0 decay t < inf [ps]
+Processed 39230933 events.
+33177010 events were in this decay time bin and passed cuts.
+39230933 RS events were processed.
+33177010 RS events were selected.
+0 WS events were processed.
+0 WS events were selected.
+
+Num phi: 33177010
+Num positive sin phi: 16586218
+Num negative sin phi: 16590792
+Num positive sin phi computed: 16586218
+Num negative sin phi computed: 16590792
+Num positive sin 2 phi: 16584563
+Num negative sin 2 phi: 16592447
+Num positive sin 2 phi computed: 16584563
+Num negative sin 2 phi computed: 16592447
+For (K*, #rho), quadrant (1):
+nD0 = 284796
+nD0Above =   127205
+nD0Below =   157591
+D0AB_asymmetry =   -0.106694  +-  0.00186315
+nD0Bar = 288680
+nD0BarAbove =   159953
+nD0BarBelow =   128727
+D0barAB_asymmetry =   0.108168  +-  0.00185027
+CP Asymmetry =   0.00148197  +-  0.00131287
+DiffAB =   -0.107436  +-  0.00131287
+nD0Sin2PhiPlus =   173849
+nD0Sin2PhiMinus =   110947
+D0Sin2Phi_asymmetry =   0.220867  +-  0.00182757
+nD0barSin2PhiPlus =   112368
+nD0barSin2PhiMinus =   176312
+D0barSin2Phi_asymmetry =   -0.221505  +-  0.00181496
+Sin2PhiCP_asymmetry =   -0.0018498  +-  0.0012878
+DiffSin2Phi =   0.221188  +-  0.0012878

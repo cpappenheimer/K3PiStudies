@@ -295,7 +295,6 @@ namespace K3PiStudies
           const TString &outputSubDir,
           const std::pair<double,
                           double> &decayTimeLimits_ps,
-          bool applyDecayTimeCut,
           bool applyCuts,
           const std::string &mode,
           bool usingCTau,
