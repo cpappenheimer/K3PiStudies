@@ -178,6 +178,19 @@ namespace K3PiStudies
 		pAprime_4vec.Boost(-1. * betaAB);
 		TLorentzVector pBprime_4vec = _pB_IN_D0CM_MEV;
 		pBprime_4vec.Boost(-1. * betaAB);
+		if (printSanityChecks)
+		{
+			std::cout << "After boost to AB frame: " << std::endl;
+			std::cout << "pAprime_4vec: "; 
+			pAprime_4vec.Print(); 
+			std::cout << "pBprime_4vec: ";
+			pBprime_4vec.Print();
+
+			TLorentzVector testAB(pAB_4vec);
+			testAB.Boost(-1. * betaAB);
+			std::cout << "Boosted pAB_4vec: ";
+			testAB.Print();
+		}
 
 		TLorentzVector pCD_4vec = _pC_IN_D0CM_MEV + _pD_IN_D0CM_MEV;
 		double energyCD = pCD_4vec.E();
@@ -187,6 +200,19 @@ namespace K3PiStudies
 		pCprime_4vec.Boost(-1. * betaCD);
 		TLorentzVector pDprime_4vec = _pD_IN_D0CM_MEV;
 		pDprime_4vec.Boost(-1. * betaCD);
+		if (printSanityChecks)
+		{
+			std::cout << "After boost to CD frame: " << std::endl;
+			std::cout << "pCprime_4vec: "; 
+			pCprime_4vec.Print(); 
+			std::cout << "pDprime_4vec: ";
+			pDprime_4vec.Print();
+
+			TLorentzVector testCD(pCD_4vec);
+			testCD.Boost(-1. * betaCD);
+			std::cout << "Boosted pCD_4vec: ";
+			testCD.Print();
+		}
 
 		TLorentzVector pABC_4vec = _pA_IN_D0CM_MEV + _pB_IN_D0CM_MEV + _pC_IN_D0CM_MEV;
 		double mAB = pAB_4vec.M();			// m(K*bar) candidate
