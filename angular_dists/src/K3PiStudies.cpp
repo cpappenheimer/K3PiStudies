@@ -781,17 +781,26 @@ namespace K3PiStudies
 
 		gStyle->SetOptStat(0);
 
-		d0Hist->SetLineColor(kBlue);
-		d0Hist->SetLineWidth(2);
-		d0Hist->Scale(1.00 / nD0);
-
-		d0barHist->SetLineColor(kRed + 1);
-		d0barHist->SetLineWidth(2);
-		d0barHist->Scale(1.00 / nD0bar);
-
 		TCanvas c1;
 
-		d0Hist->GetYaxis()->SetRangeUser(0., 1.25 * maximum / nD0);
+		TString yLabel = K3PiStudiesUtils::makeYAxisLabel(
+			CommonHistsWithKinematics::_NUM_PHI_BINS, 
+			0.0, 
+			K3PiStudiesUtils::_TWO_PI, 
+			"rad", 
+			false);
+		TString normYLabel = K3PiStudiesUtils::makeYAxisLabel(
+			CommonHistsWithKinematics::_NUM_PHI_BINS, 
+			0.0, 
+			K3PiStudiesUtils::_TWO_PI, 
+			"rad", 
+			true);
+
+		// set style
+		d0Hist->SetLineColor(kBlue);
+		d0Hist->SetLineWidth(2);
+		d0barHist->SetLineColor(kRed + 1);
+		d0barHist->SetLineWidth(2);
 		d0Hist->GetXaxis()->SetTitleSize(0.06);
 		d0Hist->GetXaxis()->SetTitleOffset(0.75);
 		d0Hist->GetXaxis()->SetLabelFont(62);
@@ -800,16 +809,14 @@ namespace K3PiStudies
 		d0Hist->SetXTitle("#phi [radians]");
 		d0Hist->GetYaxis()->SetTitleSize(0.06);
 		d0Hist->GetYaxis()->SetTitleOffset(0.75);
-		d0Hist->SetYTitle("fraction per 2#pi/100 radians");
-		d0Hist->Draw("HIST");
-		d0barHist->Draw("HIST SAME");
 
+		// create legend
 		TLegend leg(0.12, 0.76, 0.32, 0.89);
 		K3PiStudiesUtils::makeTLegendBkgTransparent(leg);
 		leg.AddEntry(d0Hist, "D^{0}", "L");
 		leg.AddEntry(d0barHist, "#bar{D}^{0}", "L");
-		leg.Draw("same");
 
+		// create text box
 		TString nd0Str = std::to_string(nD0);
 		TString nd0barStr = std::to_string(nD0bar);
 		TString d0AsymStr;
@@ -840,7 +847,6 @@ namespace K3PiStudies
 		cpSin2PhiAsymStr.Form("%4.1f\n", 100. * Sin2PhiCP_asymmetry);
 		cpSin2PhiAsymErrStr.Form("%4.1f\n", 100. * Sin2PhiCP_asymmetryErr);
 		DiffSin2PhiStr.Form("%4.1f\n", 100. * DiffSin2Phi);
-
 		TPaveText pt1(0.50, 0.7, 0.88, 0.94, "NDC"); // NDC sets coords
 		K3PiStudiesUtils::makeTPaveTextBkgTransparent(pt1);
 		pt1.AddText("Asymmetries");
@@ -850,9 +856,27 @@ namespace K3PiStudies
 		pt1.AddText("CP:   ( " + cpAsymStr + " #pm " + cpAsymErrStr + ")%   (" + cpSin2PhiAsymStr + " #pm " + cpSin2PhiAsymErrStr + ")%");
 		pt1.AddText("D^{0}-#bar{D}^{0}:  (" + DiffABStr + " #pm " + cpAsymErrStr + ")%   (" + DiffSin2PhiStr + " #pm " + cpSin2PhiAsymErrStr + ")%");
 		pt1.AddText("n(D^{0}) = " + nd0Str + "           n(#bar{D}^{0}) = " + nd0barStr);
-		pt1.Draw("same");
-		c1.SaveAs(saveName + saveExt);
 
+		// save unnormalized plots
+		d0Hist->GetYaxis()->SetRangeUser(0., 1.25 * maximum);
+		d0Hist->SetYTitle(yLabel);
+		d0Hist->Draw("HIST");
+		d0barHist->Draw("HIST SAME");
+		leg.Draw("same");
+		pt1.Draw("same");	
+		c1.SaveAs(saveName + "_no_norm" + saveExt);
+
+		// normalize and save plot
+		d0Hist->Scale(1.00 / nD0);
+		d0barHist->Scale(1.00 / nD0bar);
+		d0Hist->GetYaxis()->SetRangeUser(0., 1.25 * maximum / nD0);
+		d0Hist->SetYTitle(normYLabel);
+		d0Hist->Draw("HIST");
+		d0barHist->Draw("HIST SAME");
+		leg.Draw("same");
+		pt1.Draw("same");	
+		c1.SaveAs(saveName + saveExt);
+		
 		std::cout << std::endl;
 	}
 

@@ -13,7 +13,8 @@ def main():
     runDir = "../build"
 
     # the path to the directory in which to create the output root files (don't include trailing /)
-    outDir = "/share/lazy/pappenheimer/d2k3pi/plotting/angular_dist_plots"
+    #outDir = "/share/lazy/pappenheimer/d2k3pi/plotting/angular_dist_plots"
+    outDir = "/share/lazy/pappenheimer/d2k3pi/plotting/test"
 
     # list of the root files to process
     # RS
@@ -24,6 +25,7 @@ def main():
         "/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2016/selected_rs_single_candidates.root"]
     #filesToProcess = ["/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/2015/selected_rs_single_candidates.root"]
     #filesToProcess = ["/data/home/pappenheimer/d2k3pi_data/selected_data_extended/2015/selected_evts_with_multiple_candidates_2015_MagDown_RS.root"]
+    #filesToProcess = ["/share/lazy/pappenheimer/d2k3pi/data/selected_data_extended/SUBSET_FOR_TEST_selected_evts_with_multiple_candidates_2015_MagDown_RS.root"]
 
     # true if sample is toy MC; false otherwise
     isToyMC = False
@@ -52,7 +54,7 @@ def main():
     comparePhsp = False
 
     # Set to true to print info for the first event
-    printSanityChecks = True
+    printSanityChecks = False
 
     # Set to true if want to check that our calculated angles between vectors match results of ROOT's .Angle method
     verifyAngles = False
