@@ -22,6 +22,3 @@ Edit `RunK3PiStudies.py` to choose user input
 ```
 python RunK3PiStudies.py
 ```
-
-### Folder with plots created with this version
-TODO

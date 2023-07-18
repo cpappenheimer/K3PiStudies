@@ -653,7 +653,9 @@ namespace K3PiStudies
 				_D0_STR,
 				_D0_BAR_STR,
 				true,
-				outputSubDir + "compareMD0.png");
+				outputSubDir + "compareMD0.png",
+				"",
+				false);
 
 			allMD0VDeltaMHist->Draw("COLZ");
 			c1.SaveAs(outputSubDir + "allMD0VDeltaMHist.png");

@@ -68,7 +68,8 @@
 			"thread": "cpp",
 			"typeinfo": "cpp",
 			"lhcbStyle.C": "cpp",
-			"K3Pi_TripleProducts.C": "cpp"
+			"K3Pi_TripleProducts.C": "cpp",
+			"McK3Pi_Analysis.C": "cpp"
 		}
 	}
 }
