@@ -15,9 +15,8 @@ def main():
     UTILS_BUILD_DIR = "/data/home/pappenheimer/develop_k3pistudies/build/extern/k3pi_utilities/"
     UTILS_INC_DIR = "/data/home/pappenheimer/develop_k3pistudies/K3PiStudies/extern/k3pi_utilities/include/"
 
-    AMP_GEN_FILE = "/share/lazy/pappenheimer/d2k3pi/data/toy_MC_AmpGen_TD/D02Kpipipi_td_1000000events.root"
-    GOOFIT_FILE = "/share/lazy/pappenheimer/d2k3pi/data/toy_MC_GooFit_tim_model/RS_D0_tim_model_toy_mc_signal_x0.0_y0.0_1000000events_sampleNum0_generationSeed3626764237.csv"
-    #GOOFIT_FILE = "/share/lazy/pappenheimer/d2k3pi/data/toy_MC_GooFit_tim_model/test.txt"
+    AMP_GEN_FILE = "/share/lazy/pappenheimer/d2k3pi/data/toy_MC_AmpGen_TD/test/zenodo_version_D02Kpipipi_td_1000000events.root"
+    GOOFIT_FILE = "/share/lazy/pappenheimer/d2k3pi/data/toy_MC_GooFit_tim_model/RS_D0_tim_model_toy_mc_signal_x0.0_y0.0_1000events_sampleNum0_generationSeed3626764237_with4vecs.csv"
 
     IS_D0 = True
     IS_RS = True
@@ -28,10 +27,10 @@ def main():
 
     AMP_GEN_TREE_NAME = "DalitzEventList"
 
-    GOOFIT_T_COL_NAME = "t"
-    GOOFIT_PHI_COL_NAME = "phi"
-    GOOFIT_M12_COL_NAME = "m12"
-    GOOFIT_M34_COL_NAME = "m34"
+    GOOFIT_T_COL_NAME = "t_ps"
+    GOOFIT_PHI_COL_NAME = "phi_negPi_to_pi"
+    GOOFIT_M12_COL_NAME = "m12_MeV"
+    GOOFIT_M34_COL_NAME = "m34_MeV"
 
     AMP_GEN_D0_MASS_GEV = 1.86464 
 
@@ -122,7 +121,7 @@ def main():
     gooFitDF = gooFitDF.Define("t_ns", GOOFIT_T_COL_NAME+" / 1000.0")
 
     # phi in GooFit data ranges from -pi to pi, need to convert to 0 to 2 pi to match AmpGen
-    gooFitDF = gooFitDF.Define("phi_negPi_to_pi", 
+    gooFitDF = gooFitDF.Define("phi_0_to_2pi", 
                                "K3PiStudies::K3PiStudiesUtils::changeAngleRange_0_to_2pi("+GOOFIT_PHI_COL_NAME+")")
     
     # m12, m34 in GooFit data are in MeV, need to convert to GeV to match AmpGen
@@ -171,7 +170,7 @@ def main():
         COS_THETA34_TITLE, COS_THETA_N_BINS, COS_THETA_AXIS_MIN, COS_THETA_AXIS_MAX)
     gooFitPhiHist = py_k3pi_utilities.utils.createHistFromDF(
         gooFitDF,
-        "phi_negPi_to_pi",
+        "phi_0_to_2pi",
         "phi_goofit",
         PHI_TITLE, PHI_N_BINS, PHI_AXIS_MIN, PHI_AXIS_MAX)
     gooFitHists = [gooFitM12Hist, gooFitM34Hist, gooFitC12Hist, gooFitC34Hist, gooFitPhiHist]
