@@ -18,7 +18,12 @@ cmake --build <path to build dir>
 (`-v` for verbose builds, `-j N` for parallel builds on `N` cores)
 
 ## Running the code
-Edit `RunK3PiStudies.py` to choose user input
+To view list of command line options run
+```
+/build/angular_dists/src/K3PiStudies --help
+```
+
+Edit `RunK3PiStudies.py` to choose user inputs then
 ```
 python RunK3PiStudies.py
 ```
