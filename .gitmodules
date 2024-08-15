@@ -1,9 +1,6 @@
 [submodule "extern/CLI11"]
 	path = extern/CLI11
 	url = git@github.com:CLIUtils/CLI11.git
-[submodule "extern/lhcbstyle"]
-	path = extern/lhcbstyle
-	url = ssh://git@gitlab.cern.ch:7999/pappenhe/lhcbstyle.git
 [submodule "extern/k3pi_utilities"]
 	path = extern/k3pi_utilities
 	url = git@github.com:cpappenheimer/k3pi_utilities.git
