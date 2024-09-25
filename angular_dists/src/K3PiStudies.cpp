@@ -1425,15 +1425,15 @@ namespace K3PiStudies
 		{
 			// build reader for root file
 			TFile *f = TFile::Open(inputFile.c_str());
-			TTreeReader reader("events", f);
+			TTreeReader reader("DecayTree", f);
 			// TTreeReaderValue<double> readerM12(reader, "m12");
 			// TTreeReaderValue<double> readerM34(reader, "m34");
 			// TTreeReaderValue<double> readerC12(reader, "c12");
 			// TTreeReaderValue<double> readerC34(reader, "c34");
 			// TTreeReaderValue<double> readerPhi(reader, "phi");
 			TTreeReaderValue<double> readerDT(reader, "dtime");
-			TTreeReaderValue<bool> readerisD0(reader, "is_D0");
-			TTreeReaderValue<double> readerd0MassGeV(reader, "d0_Mass_GeV");
+			//TTreeReaderValue<bool> readerisD0(reader, "is_D0");
+			//TTreeReaderValue<double> readerd0MassGeV(reader, "d0_Mass_GeV");
 			TTreeReaderValue<double> readerkMinus_PE_GeV(reader, "kMinus_PE_GeV");
 			TTreeReaderValue<double> readerkMinus_Px_GeV(reader, "kMinus_Px_GeV");
 			TTreeReaderValue<double> readerkMinus_Py_GeV(reader, "kMinus_Py_GeV");
@@ -1451,26 +1451,21 @@ namespace K3PiStudies
 			TTreeReaderValue<double> readerpiMinus_Py_GeV(reader, "piMinus_Py_GeV");
 			TTreeReaderValue<double> readerpiMinus_Pz_GeV(reader, "piMinus_Pz_GeV");
 
+			bool _IS_D0 = true;
+			std::cout << "FIXME _IS_DO flag!" << std::endl;
+
 			// read in events
 			std::cout << "Reading in events from file " << inputFile << "..." << std::endl;
 			while (reader.Next())
 			{
 				double dtime_ps = *readerDT;
-				double mD0_MeV = *readerd0MassGeV * K3PiStudiesUtils::_GEV_TO_MEV;
-
+				
 				// if processing in decay time bins, reject events outside bin edges
 				if (!K3PiStudiesUtils::isWithinDecayTimeBin(dtime_ps, decayTimeLimits_ps))
 				{
 					continue;
 				}
 
-				bool _IS_D0 = *readerisD0;
-
-				TLorentzVector _pD0_IN_D0CM_MEV;
-				_pD0_IN_D0CM_MEV.SetE(mD0_MeV);
-				_pD0_IN_D0CM_MEV.SetPx(0.0);
-				_pD0_IN_D0CM_MEV.SetPy(0.0);
-				_pD0_IN_D0CM_MEV.SetPz(0.0);
 
 				TLorentzVector kMinus_in_D0_CM_MeV;
 				kMinus_in_D0_CM_MeV.SetE(*readerkMinus_PE_GeV * K3PiStudiesUtils::_GEV_TO_MEV);
@@ -1495,6 +1490,9 @@ namespace K3PiStudies
 				piMinus_in_D0_CM_MeV.SetPx(*readerpiMinus_Px_GeV * K3PiStudiesUtils::_GEV_TO_MEV);
 				piMinus_in_D0_CM_MeV.SetPy(*readerpiMinus_Py_GeV * K3PiStudiesUtils::_GEV_TO_MEV);
 				piMinus_in_D0_CM_MeV.SetPz(*readerpiMinus_Pz_GeV * K3PiStudiesUtils::_GEV_TO_MEV);
+
+				TLorentzVector _pD0_IN_D0CM_MEV = kMinus_in_D0_CM_MeV + piPlus1_in_D0_CM_MeV + piPlus2_in_D0_CM_MeV + piMinus_in_D0_CM_MeV;
+				double mD0_MeV = _pD0_IN_D0CM_MEV.M();
 
 				numEvents++;
 
